@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Sign Up</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+    <!-- Bulma CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css" />
+    <!-- Font Awesome CSS -->
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
+
+    <!-- JS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Roboto+Slab&family=Roboto:wght@300&family=Ubuntu:wght@700&display=swap"
+        rel="stylesheet" />
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Include jQuery UI CSS and JS -->
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+
+    <style>
+        * {
+            font-family: "Montserrat", sans-serif;
+        }
+
+        body {
+            background-color: rgb(255, 222, 231);
+            min-height: 100vh;
+        }
+
+        .logo {
+            width: 120px;
+            height: 80px;
+        }
+
+        .section {
+            padding: 1rem 1.5rem;
+            max-width: 750px;
+            margin: auto;
+        }
+
+        .title {
+            font-weight: 800;
+            font-size: 5rem;
+            color: black;
+        }
+
+        .subtitle {
+            font-size: 2rem;
+            color: black;
+        }
+
+        .is-sparta {
+            color: black !important;
+        }
+
+        .button {
+            background-color: rgb(185, 67, 67) !important;
+            color: white !important;
+        }
+
+        .button.is-outlined {
+            border-color: black !important;
+            color: black !important;
+        }
+
+        .button.is-sparta.is-outlined {
+            background-color: black;
+            border-color: #e8344e;
+            color: white !important;
+        }
+
+        .help {
+            color: gray;
+        }
+
+        .box {
+            background-color: #f8f8f8;
+        }
+
+        .b_sign {
+            width: 100%;
+        }
+
+        .small-popup {
+            width: 10px;
+            height: 10px;
+            /* Adjust the width as needed */
+        }
+    </style>
+</head>
+
+<body>
+    <section class="hero is-white" style="background-color: rgb(255, 222, 231);">
+        <div class="hero-body has-text-centered" style="padding-bottom: 1rem; margin:-30px auto auto auto;">
+            <!-- <h1 class="title is-sparta" >Personal Word</h1> -->
+            <img class="logo" src="{{ url_for('static', filename='logo_polos.png') }}" alt="">
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <div class="box" style="max-width: 480px; margin: auto">
+                <article class="media">
+                    <div class="media-content">
+                        <div class="content">
+                            <!-- ID Field -->
+                            <div class="field has-addons">
+                                <div class="control has-icons-left" style="width: 100%">
+                                    <input id="input-id" class="input" type="text" placeholder="ID" />
+                                    <span class="icon is-small is-left"><i class="fa fa-user"></i></span>
+                                </div>
+                                <div id="btn-check-dup" class="control">
+                                    <button class="button is-sparta" onclick="check_dup()">
+                                        Check your ID
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Password Field -->
+                            <div class="field">
+                                <div class="control has-icons-left">
+                                    <input id="input-password" class="input" type="password" placeholder="Password" />
+                                    <span class="icon is-small is-left"><i class="fa fa-lock"></i></span>
+                                </div>
+                            </div>
+
+                            <!-- Confirm Password Field -->
+                            <div class="field">
+                                <div class="control has-icons-left">
+                                    <input id="input-password2" class="input" type="password"
+                                        placeholder="Confirm your password" />
+                                    <span class="icon is-small is-left"><i class="fa fa-lock"></i></span>
+                                </div>
+                            </div>
+
+                            <!-- Sign Up and Clear Buttons -->
+                            <div id="div-sign-in-or-up" class="has-text-centered ">
+                                <nav class="level is-mobile">
+                                    <button class="level-item button is-sparta" onclick="sign_up()">
+                                        Sign Up
+                                    </button>
+                                    <button class="level-item button" onclick="clearInputs()">
+                                        Clear
+                                    </button>
+                                </nav>
+                                <a href="/login">Sign In</a>
+                            </div>
+
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        let cek_dup = false
+
+        function check_dup() {
+            let username = $("#input-id").val();
+            if (username === "") {
+                Swal.fire({
+                    text: 'Tolong Isi ID!',
+                })
+                return;
+            }
+            $.ajax({
+                type: "POST",
+                url: "/sign_up/check_dup",
+                data: {
+                    username_give: username,
+                },
+                success: function (response) {
+                    if (response["exists"]) {
+                        Swal.fire({
+                            text: 'This ID is already in use',
+                        })
+                    } else {
+                        Swal.fire({
+                            icon: "success",
+                            text: 'ID CAN BE USED',
+                        })
+                        cek_dup = true
+                    }
+                },
+            });
+        }
+
+        function sign_up() {
+            let username = $("#input-id").val();
+            let password = $("#input-password").val();
+            let password2 = $("#input-password2").val();
+
+
+
+            if (cek_dup === false) {
+                Swal.fire({
+                    text: 'Tolong Cek Your ID',
+                })
+                return;
+            }
+
+
+            if (password === "") {
+                Swal.fire({
+                    text: 'Tolong Isi Password!',
+                })
+                return;
+            } 
+            if (password2 === '') {
+                Swal.fire({
+                    text: 'Tolong Isi Password!',
+                })
+                return;
+            } else if (password2 !== password) {
+                Swal.fire({
+                    text: 'Password tidak sama',
+                })
+                return;
+            }
+
+
+
+            $.ajax({
+                type: "POST",
+                url: "/sign_up/save",
+                data: {
+                    username_give: username,
+                    password_give: password,
+                },
+                success: function (response) {
+                    alert("Your are signed up! Nice!");
+                    window.location.replace("/login");
+                },
+            });
+        }
+
+
+
+        function clearInputs() {
+            $("#input-id").val("");
+            $("#input-password").val("");
+            $("#input-password2").val("");
+        }
+    </script>
+</body>
+
+
+</html>
